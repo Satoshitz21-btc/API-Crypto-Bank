@@ -1,0 +1,81 @@
+📁 postman/findigi-api.postman_collection.json
+{
+  "info": {
+    "name": "Findigi Crypto Banking API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "https://sandbox.findigi.io/v1" },
+    { "key": "api_key", "value": "YOUR_API_KEY" }
+  ],
+  "item": [
+    {
+      "name": "Onramp Quote",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{api_key}}" }
+        ],
+        "url": "{{base_url}}/onramp/quote",
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"fiat\":\"IDR\",\"crypto\":\"USDT\",\"amount\":1000000 }"
+        }
+      }
+    },
+    {
+      "name": "Swap Crypto",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{api_key}}" }
+        ],
+        "url": "{{base_url}}/swap",
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"from\":\"USDT\",\"to\":\"ETH\",\"amount\":1000 }"
+        }
+      }
+    },
+    {
+      "name": "Send Crypto",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{api_key}}" }
+        ],
+        "url": "{{base_url}}/wallet/send",
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"to\":\"0xABC...\",\"amount\":0.5,\"asset\":\"ETH\" }"
+        }
+      }
+    }
+  ]
+}
+1️ Struktur Repository (Next.js API Docs)
+crypto-bank-platform/
+├── app/
+│   ├── api/
+│   │   ├── buy/route.ts
+│   │   ├── sell/route.ts
+│   │   ├── swap/route.ts
+│   │   ├── onramp/route.ts
+│   │   ├── offramp/route.ts
+│   │   ├── transfer/route.ts
+│   │   ├── networks/route.ts
+│   │   ├── debit-card/route.ts
+│   │   └── auth/route.ts
+│   ├── docs/
+│   │   └── page.tsx   ← Swagger UI
+│   └── layout.tsx
+├── lib/
+│   ├── auth.ts
+│   ├── rate-limit.ts
+│   └── provider.ts
+├── public/
+│   └── openapi.yaml
+└── postman/
+    └── CryptoBank_API.postman_collection.json
+
+
