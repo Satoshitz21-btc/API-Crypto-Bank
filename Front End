@@ -12,3 +12,149 @@ findigi-landing/
 │   └── findigi-logo.svg
 ├── tailwind.config.ts
 └── package.json
+1. app/layout.tsx
+import "./globals.css";
+
+2. export const metadata = {
+  title: "Findigi | Crypto Banking Platform",
+  description: "Onramp, Offramp, Swap, Send, Receive & Crypto Card Solution",
+};
+
+3. export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" className="dark">
+      <body className="bg-[#0B0F1A] text-white antialiased">
+        {children}
+      </body>
+    </html>
+  );
+}
+
+4. app/page.tsx
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+import Features from "@/components/Features";
+import WhatsAppFloating from "@/components/WhatsAppFloating";
+
+export default function Home() {
+  return (
+    <>
+      <Navbar />
+      <Hero />
+      <Features />
+      <WhatsAppFloating />
+    </>
+  );
+}
+
+5. components/Navbar.tsx
+export default function Navbar() {
+  return (
+    <nav className="flex items-center justify-between px-10 py-6 border-b border-white/10">
+      {/* Left */}
+      <div className="flex items-center gap-3">
+        <img src="/findigi-logo.svg" alt="Findigi" className="h-8" />
+      </div>
+
+      {/* Right */}
+      <div className="flex items-center gap-6">
+        <a href="/api-docs" className="text-sm text-gray-300 hover:text-white">
+          API Docs
+        </a>
+
+        <button className="px-4 py-2 text-sm rounded-lg bg-white/10 hover:bg-white/20">
+          Connect Wallet
+        </button>
+
+        <button className="px-4 py-2 text-sm rounded-lg bg-blue-600 hover:bg-blue-700">
+          Login
+        </button>
+      </div>
+    </nav>
+  );
+}
+
+6. components/Hero.tsx
+export default function Hero() {
+  return (
+    <section className="px-10 py-24 max-w-7xl mx-auto">
+      <h1 className="text-5xl font-semibold leading-tight">
+        Modern <span className="text-blue-500">Crypto Banking</span> Platform
+      </h1>
+
+      <p className="mt-6 text-lg text-gray-400 max-w-2xl">
+        Onramp, offramp, swap, send, receive, and spend crypto seamlessly
+        with institutional-grade infrastructure.
+      </p>
+
+      <div className="mt-10 flex gap-4">
+        <button className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700">
+          Connect Wallet
+        </button>
+
+        <button className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20">
+          View API Docs
+        </button>
+      </div>
+    </section>
+  );
+}
+
+7. components/Features.tsx
+const features = [
+  "Onramp / Offramp",
+  "Crypto Swap",
+  "Send & Receive",
+  "Crypto Debit Card",
+];
+
+export default function Features() {
+  return (
+    <section className="px-10 py-20 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
+      {features.map((item) => (
+        <div
+          key={item}
+          className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur"
+        >
+          <h3 className="text-lg font-medium">{item}</h3>
+          <p className="mt-2 text-sm text-gray-400">
+            Secure, compliant, and scalable crypto banking solution.
+          </p>
+        </div>
+      ))}
+    </section>
+  );
+}
+
+8. components/WhatsAppFloating.tsx
+export default function WhatsAppFloating() {
+  return (
+    <a
+      href="https://wa.me/628XXXXXXXXX"
+      target="_blank"
+      className="fixed bottom-6 right-6 w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="white"
+        viewBox="0 0 24 24"
+        className="w-6 h-6"
+      >
+        <path d="M12.04 2C6.58 2 2.1 6.48 2.1 11.94c0 2.1.55 4.05 1.6 5.77L2 22l4.41-1.55a9.88 9.88 0 0 0 5.63 1.78c5.46 0 9.94-4.48 9.94-9.94C22 6.48 17.52 2 12.04 2z" />
+      </svg>
+    </a>
+  );
+}
+
+9. app/globals.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+}
