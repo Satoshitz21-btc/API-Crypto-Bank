@@ -158,3 +158,193 @@ export default function WhatsAppFloating() {
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont;
 }
+WALLET INTEGRATION
+
+Findigi – MetaMask & WalletConnect
+
+Stack
+
+wagmi (industry standard)
+
+viem
+
+@web3modal/wagmi (WalletConnect v2)
+
+Next.js 14 (App Router)
+
+1. Install Dependencies
+npm install wagmi viem @web3modal/wagmi @web3modal/ethereum
+
+2. Buat Wallet Config
+lib/walletConfig.ts
+import { createWeb3Modal } from "@web3modal/wagmi/react"
+import { WagmiConfig, createConfig } from "wagmi"
+import { mainnet, polygon, bsc } from "wagmi/chains"
+import { walletConnect, injected } from "wagmi/connectors"
+import { http } from "viem"
+
+export const projectId = "YOUR_WALLETCONNECT_PROJECT_ID"
+
+export const wagmiConfig = createConfig({
+  chains: [mainnet, polygon, bsc],
+  connectors: [
+    injected({ shimDisconnect: true }), // MetaMask
+    walletConnect({ projectId })         // WalletConnect
+  ],
+  transports: {
+    [mainnet.id]: http(),
+    [polygon.id]: http(),
+    [bsc.id]: http()
+  }
+})
+
+createWeb3Modal({
+  wagmiConfig,
+  projectId,
+  enableAnalytics: false,
+  themeMode: "dark"
+})
+
+
+📌 Project ID → ambil dari
+👉 https://cloud.walletconnect.com
+
+3. Wrap App dengan Wagmi Provider
+app/providers.tsx
+"use client"
+
+import { WagmiConfig } from "wagmi"
+import { wagmiConfig } from "@/lib/walletConfig"
+
+export default function Providers({ children }: { children: React.ReactNode }) {
+  return <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>
+}
+
+Update app/layout.tsx
+import Providers from "./providers"
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" className="dark">
+      <body className="bg-[#0B0F1A] text-white">
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  )
+}
+
+4. Connect Wallet Button (Reusable)
+components/ConnectWallet.tsx
+"use client"
+
+import { useAccount, useDisconnect } from "wagmi"
+
+export default function ConnectWallet() {
+  const { address, isConnected } = useAccount()
+  const { disconnect } = useDisconnect()
+
+  if (isConnected) {
+    return (
+      <button
+        onClick={() => disconnect()}
+        className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm"
+      >
+        {address?.slice(0, 6)}...{address?.slice(-4)}
+      </button>
+    )
+  }
+
+  return (
+    <button
+      onClick={() => (window as any).openWeb3Modal()}
+      className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-sm"
+    >
+      Connect Wallet
+    </button>
+  )
+}
+
+5. Integrasi ke Navbar
+components/Navbar.tsx
+import ConnectWallet from "./ConnectWallet"
+
+export default function Navbar() {
+  return (
+    <nav className="flex items-center justify-between px-10 py-6 border-b border-white/10">
+      <img src="/findigi-logo.svg" className="h-8" />
+
+      <div className="flex items-center gap-6">
+        <a href="/api-docs" className="text-sm text-gray-300 hover:text-white">
+          API Docs
+        </a>
+
+        <ConnectWallet />
+
+        <button className="px-4 py-2 text-sm rounded-lg bg-white/10">
+          Login
+        </button>
+      </div>
+    </nav>
+  )
+}
+
+6. Wallet State (Untuk Banking Logic)
+lib/useWallet.ts
+import { useAccount, useNetwork } from "wagmi"
+
+export function useWalletState() {
+  const { address, isConnected } = useAccount()
+  const { chain } = useNetwork()
+
+  return {
+    address,
+    isConnected,
+    network: chain?.name
+  }
+}
+
+
+Dipakai untuk:
+
+Onramp/offramp
+
+Swap routing
+
+KYC gating
+
+Debit card eligibility
+
+7. Security Rules (WAJIB PROD)
+
+✅ JANGAN:
+
+Simpan private key
+
+Auto-sign tx
+
+Trust frontend only
+
+✅ WAJIB:
+
+Signature verification di backend
+
+Nonce-based auth
+
+Chain whitelist
+
+Read-only default
+
+8. UX FLOW (Crypto Bank Style)
+Connect Wallet
+→ Check Network
+→ Check KYC (if needed)
+→ Enable Onramp / Swap / Card
+
+
+Tidak ada:
+
+Trading chart
+
+Leverage
+
+Casino UI
