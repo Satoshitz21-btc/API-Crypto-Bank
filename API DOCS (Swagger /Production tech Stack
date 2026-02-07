@@ -1,0 +1,201 @@
+PRODUCTION-READY CRYPTO BANK STACK
+(B2B + B2C, Onramp–Offramp, Swap, Card, API)
+________________________________________
+Design Principle (Mandatory)
+
+Crypto bank ≠ DEX app
+Fokus: custody safety, compliance, settlement, auditability
+Core principles:
+•	Separation of duties
+•	Zero-trust
+•	Defense in depth
+•	API-first
+•	Compliance-ready
+________________________________________
+1. HIGH-LEVEL ARCHITECTURE
+Client (Web / Partner / App)
+        |
+     API Gateway
+        |
+ ┌──────┼────────┐
+ |      |        |
+Auth  Core     Observability
+ |      |
+ |   ┌──┴──────────────┐
+ |   | Business Layer  |
+ |   |----------------|
+ |   | Onramp/Offramp |
+ |   | Buy / Sell     |
+ |   | Swap Routing   |
+ |   | Treasury       |
+ |   | Card Service   |
+ |   └──┬──────────────┘
+ |      |
+ |   Blockchain Layer
+ |      |
+ |   Custody & KMS
+ |
+ Compliance Layer
+________________________________________
+
+2. INFRASTRUCTURE STACK
+
+Cloud
+•	AWS / GCP
+•	Dedicated VPC
+•	Private Subnets
+•	Bastion Host
+•	WAF + DDoS Shield
+
+Core Infra
+Component	Tool
+API Gateway	Kong / AWS API Gateway
+Container	Docker + ECS / GKE
+Secrets	Vault / Cloud KMS
+DB	Postgres (ledger), Redis
+Queue	Kafka / SQS
+Object	S3 (audit logs)
+________________________________________
+3.IDENTITY & ACCESS (B2B + B2C)
+
+B2C
+•	Email / Phone
+•	JWT (short-lived)
+•	Refresh token
+•	Device binding
+
+B2B
+•	API Key + HMAC
+•	IP Whitelist
+•	Role-based scope
+•	Key rotation
+
+Scopes:
+wallet:read
+wallet:transfer
+trade:execute
+card:issue
+admin:settlement
+________________________________________
+
+4. CORE BANKING MODULES
+________________________________________
+ONRAMP / OFFRAMP
+Flow:
+User → Quote → Lock Rate → Payment → Settlement → Ledger
+
+Key controls:
+•	Quote expiry
+•	FX slippage cap
+•	Payment reconciliation
+•	T+0 / T+1 settlement
+•	Manual override (ops)
+________________________________________
+
+SMART SWAP (Production)
+Sources:
+•	DEX (Uniswap, Curve, Sushi)
+•	Internal liquidity
+•	OTC desk
+Routing modes:
+•	Retail (simple)
+•	Pro (best price)
+•	Treasury (TWAP/VWAP)
+Protections:
+•	MEV protected
+•	Slippage hard-cap
+•	Gas ceiling
+•	Fallback route
+________________________________________
+TREASURY & LIQUIDITY
+Wallet	Purpose
+Hot	Instant tx
+Warm	Daily ops
+Cold	Treasury
+Fee	Revenue
+•	Multi-sig
+•	Daily limit
+•	Manual approval for large tx
+________________________________________
+
+CRYPTO DEBIT CARD (Visa / MC)
+
+Architecture:
+User Balance → Card Ledger → Authorization → FX → Settlement
+Features:
+•	Virtual / Physical
+•	Real-time authorization
+•	MCC filtering
+•	Velocity limits
+•	Auto top-up
+________________________________________
+5. LEDGER SYSTEM (NON-NEGOTIABLE)
+Ledger is the heart of crypto bank
+Ledger Rules
+•	Double entry
+•	Immutable
+•	Append-only
+•	Reconciliation ready
+Debit: User Wallet
+Credit: Treasury Wallet
+No direct DB balance edits. Ever.
+________________________________________
+6. COMPLIANCE & RISK LAYER
+AML / KYT
+•	Chainalysis / TRM
+•	Address screening
+•	Tx monitoring
+•	Risk scoring
+Compliance
+•	Travel Rule (B2B)
+•	Suspicious Activity Reports
+•	Audit logs (7+ years)
+________________________________________
+
+OBSERVABILITY & OPS
+Monitoring
+•	Wallet balances
+•	Tx latency
+•	Swap failure rate
+•	Gas anomaly
+•	API abuse
+Incident Mode
+•	Read-only switch
+•	Pause swaps
+•	Freeze wallets
+•	Card suspension
+________________________________________
+DEPLOYMENT PIPELINE
+Code → CI → Security Scan → Testnet → Staging → Prod
+Mandatory
+•	SAST / DAST
+•	Pen test
+•	Disaster recovery drill
+•	Rollback plan
+________________________________________
+9. ENVIRONMENT SEPARATION
+Env	Purpose
+dev	Feature
+testnet	QA
+staging	Partner
+prod	Real funds
+NO SHARED KEYS.
+________________________________________
+10. GO-LIVE CHECKLIST (EXECUTIVE)
+•	 Infra hardened
+•	 Ledger verified
+•	 Keys in KMS
+•	 Limits enforced
+•	 Monitoring live
+•	 Incident drill done
+•	 Legal sign-off
+If one unchecked → NO LAUNCH.
+________________________________________
+
+WHY THIS STACK SURVIVES
+- Can scale B2C → B2B
+- Survives black swan
+- Audit-friendly
+- Bank & regulator readable
+- Not dependent on hype infra
+
