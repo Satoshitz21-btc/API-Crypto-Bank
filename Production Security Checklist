@@ -1,0 +1,151 @@
+Crypto Bank / Payment / Swap Platform
+________________________________________
+1. Infrastructure & Network Security (P0 – WAJIB)
+
+Cloud / Server
+•	 Dedicated VPC (no public DB)
+•	 Private subnet untuk DB & signing service
+•	 Security Group minimal (deny-all default)
+•	 Bastion host (no direct SSH)
+•	 OS hardening (disable root login)
+•	 Auto patching OS
+•	 Cloud provider DDoS protection (AWS Shield / GCP Armor)
+
+Network
+•	 WAF (rate-limit, bot protection)
+•	 Geo-blocking (jika perlu)
+•	 No open RPC to public
+•	 Separate RPC for:
+o	read
+o	write
+o	signing
+________________________________________
+2. Secrets & Key Management (P0 – CRITICAL)
+
+Private Keys
+•	 NO PRIVATE KEY IN CODE / ENV
+•	 HSM / KMS (AWS KMS / GCP KMS / HashiCorp Vault)
+•	 Key rotation policy
+•	 Separate hot / warm / cold wallet
+•	 Multi-sig treasury wallet
+
+
+Secrets
+•	 Vault for API keys
+•	 Encrypted at rest
+•	 Never logged
+•	 Environment isolation (dev/test/prod)
+________________________________________
+3. Wallet & Blockchain Security
+Wallet
+•	 Transaction simulation before sign
+•	 Allowlist contracts only
+•	 Daily transfer limit
+•	 Velocity control (tx/min)
+•	 Emergency kill-switch
+
+Swap / Routing
+•	 Slippage cap hard-limit
+•	 Gas ceiling
+•	 MEV protection (Flashbots / private RPC)
+•	 Reentrancy protection
+•	 Contract bytecode verification
+________________________________________
+4. API Security (B2B & B2C)
+
+Authentication
+•	 OAuth2 / JWT short-lived
+•	 API key scoped by permission
+•	 IP whitelist for B2B
+•	 HMAC signing (Postman friendly)
+•	 Rotate keys automatically
+
+Protection
+•	 Rate limit per API key
+•	 Replay attack protection
+•	 Nonce validation
+•	 Request timestamp expiry
+•	 Payload signature verification
+verifyHmac(req.body, apiKey.secret)
+________________________________________
+5.Application Security (Next.js)
+ Web
+•	 CSP headers
+•	 CSRF protection
+•	 XSS sanitization
+•	 Secure cookies (HttpOnly, SameSite)
+•	 No wallet action from client without server validation
+
+Dependency
+•	 npm audit clean
+•	 Lockfile enforced
+•	 Remove unused packages
+•	 Weekly dependency scan
+________________________________________
+6.Transaction Safety Layer
+Validation
+•	 Amount sanity check
+•	 Network validation
+•	 Token contract allowlist
+•	 Decimal mismatch protection
+•	 Dust attack filter
+
+ Execution
+•	 Idempotency key
+•	 Retry with backoff
+•	 Atomic execution
+•	 Partial failure rollback
+________________________________________
+7. Monitoring, Logging & Alerting
+Monitoring
+•	 Wallet balance monitor
+•	 Unusual tx pattern alert
+•	 Gas spike alert
+•	 Liquidity drain detection
+•	 API abuse detection
+
+Alert Channel
+•	 Telegram / Slack / PagerDuty
+•	 24/7 alert escalation
+•	 On-call rotation
+________________________________________
+8.Incident Response (IR Plan)
+Must Have
+•	 Emergency pause function
+•	 Freeze wallet capability
+•	 Kill swap routing
+•	 Read-only mode
+
+Runbook
+•	 Breach response SOP
+•	 Communication template
+•	 Authority chain defined
+•	 Legal contact ready
+________________________________________
+9. Compliance & Regulatory Safety
+
+•	 KYC/AML provider integrated
+•	 Transaction monitoring
+•	 Sanction screening
+•	 Travel Rule readiness (B2B)
+•	 Data retention policy
+________________________________________
+10. Pre-GoLive Final Checklist (SIGN-OFF)
+Item	Status
+Infra hardened	
+Keys secured	
+Wallet limits	
+API locked	
+Monitoring live	
+Incident drill	
+Legal sign-off	
+No go-live without ALL checked.
+________________________________________
+Common Production Killers (Avoid This)
+Private key in .env
+Unlimited hot wallet
+Public RPC signing
+No MEV protection
+No rate limit
+No incident plan
+
