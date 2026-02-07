@@ -1,0 +1,38 @@
+"/trade/buy": {
+  post: {
+    summary: "Buy Crypto",
+    requestBody: {
+      content: {
+        "application/json": {
+          schema: {
+            properties: {
+              asset: { example: "BTC" },
+              amount: { example: 0.01 },
+              network: { example: "bitcoin" },
+            },
+          },
+        },
+      },
+    },
+    responses: { 200: { description: "Buy executed" } },
+  },
+},
+
+"/trade/sell": {
+  post: {
+    summary: "Sell Crypto",
+    requestBody: {
+      content: {
+        "application/json": {
+          schema: {
+            properties: {
+              asset: { example: "ETH" },
+              amount: { example: 1 },
+            },
+          },
+        },
+      },
+    },
+    responses: { 200: { description: "Sell executed" } },
+  },
+},
