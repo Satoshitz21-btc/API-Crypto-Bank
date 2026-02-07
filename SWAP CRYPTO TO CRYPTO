@@ -1,0 +1,20 @@
+"/swap": {
+  post: {
+    summary: "Swap Crypto",
+    requestBody: {
+      content: {
+        "application/json": {
+          schema: {
+            properties: {
+              from: { example: "USDT" },
+              to: { example: "ETH" },
+              amount: { example: 1000 },
+              network: { example: "ethereum" },
+            },
+          },
+        },
+      },
+    },
+    responses: { 200: { description: "Swap executed" } },
+  },
+},
