@@ -1,0 +1,30 @@
+"/wallet/send": {
+  post: {
+    summary: "Send Crypto",
+    requestBody: {
+      content: {
+        "application/json": {
+          schema: {
+            properties: {
+              to: { example: "0xABC..." },
+              amount: { example: 0.5 },
+              asset: { example: "ETH" },
+            },
+          },
+        },
+      },
+    },
+    responses: { 200: { description: "Transaction sent" } },
+  },
+},
+
+"/wallet/receive": {
+  get: {
+    summary: "Generate Deposit Address",
+    parameters: [
+      { name: "asset", in: "query", example: "USDT" },
+      { name: "network", in: "query", example: "tron" },
+    ],
+    responses: { 200: { description: "Deposit address generated" } },
+  },
+},
