@@ -1,0 +1,41 @@
+"/onramp/quote": {
+  post: {
+    summary: "Fiat to Crypto Quote",
+    requestBody: {
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              fiat: { type: "string", example: "IDR" },
+              crypto: { type: "string", example: "USDT" },
+              amount: { type: "number", example: 1000000 },
+            },
+          },
+        },
+      },
+    },
+    responses: { 200: { description: "Quote generated" } },
+  },
+},
+
+"/offramp/execute": {
+  post: {
+    summary: "Crypto to Fiat Settlement",
+    requestBody: {
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              crypto: { example: "USDT" },
+              amount: { example: 500 },
+              bank_account_id: { example: "bank_001" },
+            },
+          },
+        },
+      },
+    },
+    responses: { 200: { description: "Settlement initiated" } },
+  },
+},
