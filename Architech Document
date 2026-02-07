@@ -1,0 +1,18 @@
+A. ARSITEKTUR DOKUMENTASI (BEST PRACTICE)
+1️ Single Source of Truth
+
+OpenAPI (Swagger) → untuk web /api-docs
+
+Postman Collection → untuk testing & sandbox
+
+Endpoint konsisten (bank-grade, bukan Web3 chaotic)
+
+1. API Scope Final
+
+Auth
+Onramp / Offramp
+Buy / Sell
+Swap (crypto-crypto)
+Network Selection
+Send / Receive
+Crypto Debit Card Integration
