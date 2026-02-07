@@ -1,0 +1,10 @@
+"/networks": {
+  get: {
+    summary: "List Supported Networks",
+    responses: {
+      200: {
+        description: "Networks",
+      },
+    },
+  },
+},
