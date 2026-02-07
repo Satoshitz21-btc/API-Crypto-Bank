@@ -1,0 +1,25 @@
+"/card/issue": {
+  post: {
+    summary: "Issue Crypto Debit Card",
+    requestBody: {
+      content: {
+        "application/json": {
+          schema: {
+            properties: {
+              user_id: { example: "user_001" },
+              currency: { example: "USDT" },
+            },
+          },
+        },
+      },
+    },
+    responses: { 200: { description: "Card issued" } },
+  },
+},
+
+"/card/transactions": {
+  get: {
+    summary: "List Card Transactions",
+    responses: { 200: { description: "Transactions list" } },
+  },
+},
