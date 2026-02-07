@@ -1,0 +1,14 @@
+findigi-landing/
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx
+│   └── globals.css
+├── components/
+│   ├── Navbar.tsx
+│   ├── Hero.tsx
+│   ├── Features.tsx
+│   └── WhatsAppFloating.tsx
+├── public/
+│   └── findigi-logo.svg
+├── tailwind.config.ts
+└── package.json
