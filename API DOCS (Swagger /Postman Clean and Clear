@@ -1,0 +1,323 @@
+API AUTH STANDARD (B2B & B2C)
+Headers
+Authorization: Bearer <API_KEY or JWT>
+X-Client-Type: B2B | B2C
+X-Idempotency-Key: <uuid>
+________________________________________
+API ENDPOINT SPEC (Swagger Style)
+Auth
+POST /api/auth/token
+{
+  "client_id": "merchant_xxx",
+  "client_secret": "*****",
+  "scope": "wallet trade card"
+}
+________________________________________
+BUY Crypto
+POST /api/buy
+{
+  "fiat": "IDR",
+  "amount": 1000000,
+  "crypto": "BTC",
+  "network": "bitcoin",
+  "wallet_address": "bc1..."
+}
+Response:
+{
+  "order_id": "BUY-2026-001",
+  "rate": 980000000,
+  "crypto_amount": 0.00102,
+  "status": "pending"
+}
+________________________________________
+SELL Crypto
+POST /api/sell
+{
+  "crypto": "ETH",
+  "amount": 0.5,
+  "fiat": "IDR",
+  "bank_account": "BCA-123xxx"
+}
+________________________________________
+SWAP Crypto
+POST /api/swap
+{
+  "from": "USDT",
+  "to": "BTC",
+  "amount": 1000,
+  "network": "ethereum"
+}
+________________________________________
+ONRAMP
+POST /api/onramp
+{
+  "method": "virtual_account",
+  "fiat": "IDR",
+  "amount": 2000000
+}
+________________________________________
+OFFRAMP
+POST /api/offramp
+{
+  "crypto": "USDT",
+  "amount": 500,
+  "destination": "bank"
+}
+________________________________________
+NETWORK LIST
+GET /api/networks
+Response:
+[
+  { "name": "Ethereum", "chainId": 1 },
+  { "name": "BNB Chain", "chainId": 56 },
+  { "name": "Bitcoin", "chainId": 0 }
+]
+________________________________________
+SEND / RECEIVE
+POST /api/transfer
+{
+  "direction": "send",
+  "asset": "USDC",
+  "amount": 100,
+  "network": "polygon",
+  "to": "0xabc..."
+}
+________________________________________
+CRYPTO DEBIT CARD
+POST /api/debit-card/issue
+{
+  "user_id": "user_123",
+  "type": "virtual",
+  "currency": "USD"
+}
+GET /api/debit-card/transactions
+________________________________________
+openapi.yaml (Swagger)
+openapi: 3.0.3
+info:
+  title: Crypto Bank API
+  version: 1.0.0
+servers:
+  - url: https://api.findigi.io
+paths:
+  /buy:
+    post:
+      summary: Buy crypto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BuyRequest"
+      responses:
+        "200":
+          description: Buy Order Created
+________________________________________
+Swagger UI in Next.js
+// app/docs/page.tsx
+"use client";
+import SwaggerUI from "swagger-ui-react";
+import "swagger-ui-react/swagger-ui.css";
+
+export default function Docs() {
+  return <SwaggerUI url="/openapi.yaml" />;
+}
+________________________________________
+POSTMAN COLLECTION (Clean Version)
+CryptoBank_API.postman_collection.json
+{
+  "info": {
+    "name": "Crypto Bank API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Buy Crypto",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{base_url}}/buy",
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"crypto\": \"BTC\", \"amount\": 1000000 }"
+        }
+      }
+    }
+  ]
+}
+________________________________________
+B2B vs B2C MODE
+Feature	B2C	B2B
+Rate	Retail	Custom spread
+API Key	User JWT	Merchant Key
+Limit	Per-user	Per-company
+Settlement	Instant	T+1 / T+3
+________________________________________
+TESTING MODE (Dummy / Testnet)
+NEXT_PUBLIC_API_ENV=testnet
+NEXT_PUBLIC_BLOCKCHAIN_PROVIDER=mock
+Status:
+•	pending
+•	confirmed
+•	failed_simulated
+
+SMART ROUTING SWAP
+Tujuan:
+➡️ Dapat harga terbaik + gas termurah + probabilitas sukses tertinggi
+➡️ Multi-DEX, multi-network
+➡️ Cocok untuk B2C (retail) & B2B (treasury / institution)
+1. Architecture Overview (Mental Model)
+
+User Swap Request
+   ↓
+Quote Engine
+   ↓
+Liquidity Sources
+   ├─ Uniswap
+   ├─ Curve
+   ├─ Sushi
+   ├─ CEX internal liquidity (optional)
+   ↓
+Route Optimizer
+   ├─ Best Price
+   ├─ Lowest Gas
+   ├─ Slippage Control
+   ├─ Partial Split Routing
+   ↓
+Execution Engine
+   ↓
+Settlement & Reporting
+________________________________________
+2. Supported Routing Strategy
+Strategy	Kapan dipakai
+Single Route	Amount kecil, gas mahal
+Split Route	Amount besar
+Gas Optimized	Network congested
+Slippage Safe	Volatile pair
+Treasury Mode	B2B besar
+________________________________________
+3. API CONTRACT (Swap Smart Routing)
+Endpoint
+POST /api/swap/route
+Request
+{
+  "from": "USDC",
+  "to": "ETH",
+  "amount": 100000,
+  "network": "ethereum",
+  "routing": "smart",
+  "slippage": 0.5
+}
+________________________________________
+4. Core Logic – Route Discovery
+// lib/swap/routeDiscovery.ts
+export async function discoverRoutes(params) {
+  const sources = await Promise.all([
+    quoteUniswap(params),
+    quoteCurve(params),
+    quoteSushi(params)
+  ])
+
+  return sources.filter(s => s.liquidity > params.amount)
+}
+________________________________________
+4. Price + Gas + Slippage Optimizer 
+// lib/swap/optimizer.ts
+export function optimizeRoute(routes) {
+  return routes
+    .map(route => ({
+      ...route,
+      score:
+        route.outputAmount
+        - route.gasCost
+        - route.slippageRisk
+    }))
+    .sort((a, b) => b.score - a.score)[0]
+}
+Scoring Formula (simple version):
+Best Route =
+  Output Amount
+  – Gas Cost
+  – Slippage Risk
+  – Failure Probability
+________________________________________
+6. Split Routing (Advanced Mode)
+export function splitRoute(routes, amount) {
+  return [
+    { route: routes[0], percent: 60 },
+    { route: routes[1], percent: 40 }
+  ]
+}
+Dipakai untuk:
+•	Order besar
+•	Pair illiquid
+•	Treasury execution
+________________________________________
+7. Next.js API Route (Final Handler)
+// app/api/swap/route/route.ts
+import { discoverRoutes } from "@/lib/swap/routeDiscovery"
+import { optimizeRoute } from "@/lib/swap/optimizer"
+
+export async function POST(req: Request) {
+  const body = await req.json()
+
+  const routes = await discoverRoutes(body)
+  const bestRoute = optimizeRoute(routes)
+
+  return Response.json({
+    status: "ok",
+    bestRoute,
+    alternatives: routes.slice(1, 3)
+  })
+}
+________________________________________
+8. Response Example
+{
+  "bestRoute": {
+    "dex": "Uniswap",
+    "path": ["USDC", "ETH"],
+    "expectedOutput": 58.23,
+    "gas": 4.2,
+    "score": 53.8
+  },
+  "alternatives": [
+    { "dex": "Curve", "expectedOutput": 57.9 },
+    { "dex": "Sushi", "expectedOutput": 57.6 }
+  ]
+}
+________________________________________
+9. B2B MODE (Treasury / Institution)
+Tambahan logic:
+•	TWAP
+•	VWAP
+•	Time-delayed execution
+•	OTC fallback
+if (clientType === "B2B" && amount > 1_000_000) {
+  enableTWAP()
+  splitRouteExecution()
+}
+________________________________________
+Risk & Safety Layer
+Risk	Mitigation
+Sandwich attack	Private RPC / MEV protection
+Slippage	Dynamic slippage
+Gas spike	Gas ceiling
+Partial failure	Atomic fallback
+________________________________________
+Testnet / Dummy Mode
+if (process.env.API_ENV === "testnet") {
+  return mockBestRoute()
+}
+Status:
+•	quote_only
+•	simulated_execution
+•	dry_run
+________________________________________
+- Integrates With
+- WalletConnect / MetaMask
+- Debit Card Balance
+- Treasury Dashboard
+- Postman / Swagger
+- Dark-mode Crypto Bank UI
