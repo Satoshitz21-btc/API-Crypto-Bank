@@ -1,0 +1,34 @@
+📁 lib/swagger.ts
+
+const spec = {
+  openapi: "3.0.3",
+  info: {
+    title: "Findigi Crypto Banking API",
+    version: "1.0.0",
+    description: "API-first crypto banking infrastructure",
+  },
+  servers: [
+    { url: "https://api.findigi.io/v1", description: "Production" },
+    { url: "https://sandbox.findigi.io/v1", description: "Sandbox" },
+  ],
+  security: [{ BearerAuth: [] }],
+  components: {
+    securitySchemes: {
+      BearerAuth: {
+        type: "http",
+        scheme: "bearer",
+      },
+    },
+  },
+  paths: {
+🔐 AUTH
+"/auth/api-key": {
+  post: {
+    summary: "Generate API Key",
+    responses: {
+      200: {
+        description: "API Key generated",
+      },
+    },
+  },
+},
